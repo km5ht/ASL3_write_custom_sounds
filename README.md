@@ -48,5 +48,14 @@ TTSVOICE=en_US-hfc_male-medium.onnx
 ## Save the voice name off to a file in /tmp  this insures the
 ## environment variable is set for cron based announcements.
 57 * * * * echo $TTSVOICE > /tmp/voice
+
+The on caveate is the cron entry only sets the evironment variable once per hour at minute 57,
+but you can manually run the the two entries before kicking off the write_custom_sounds.sh script.
+crontab for root is the only place I define the voice to be used, so it's a single edit to change it.
+
+TTSVOICE=en_US-amy-low.onnx
+
+echo $TTSVOICE > /tmp/voice
+
 ##
 ## ttsvoice-definition.sh  is a bash helper script file.
