@@ -40,13 +40,13 @@ en_US-ryan-low.onnx
 ## These entries go into root crontab to define the which voice to use.
 ## The rest of the world can then use the environment variable.
 -------------------------------------------------------------------------------------------
-#### Set the TTSVOICE environment variable.  I like these two because they talk fast.
-#### Uncomment the one you want to use.
+## Set the TTSVOICE environment variable.  I like these two because they talk fast.
+## Uncomment the one you want to use.
 TTSVOICE=en_US-amy-low.onnx
 
 TTSVOICE=en_US-hfc_male-medium.onnx
 ## Save the voice name off to a file in /tmp  this insures the
 ## environment variable is set for cron based announcements.
 57 * * * * echo $TTSVOICE > /tmp/voice
-
+##
 ## ttsvoice-definition.sh  is a bash helper script file.
