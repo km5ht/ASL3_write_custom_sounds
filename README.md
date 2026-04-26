@@ -19,7 +19,7 @@ sudo asl-tts -n <NODE_NUMBER> -t  " Hello, This is a test "
 
 Download any extra voices you want to /var/lib/piper-tts/
 
-#### Installed Voices
+#### These are my Installed Voices
 en_US-amy2-low.onnx
 
 en_US-arctic-medium.onnx
