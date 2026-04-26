@@ -14,6 +14,7 @@ https://github.com/AllStarLink/asl3-tts
 https://github.com/rhasspy/piper/blob/master/VOICES.md
 
 sudo apt-get install asl3-tts
+
 sudo asl-tts -n <NODE_NUMBER> -t  " Hello, This is a test "
 
 Download any extra voices you want to /var/lib/piper-tts/
