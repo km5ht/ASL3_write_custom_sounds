@@ -10,22 +10,17 @@
 # en_US-ljspeech-medium.onnx   en_US-norman-medium.onnx          en_US-ryan-low.onnx
 #
 # Set the TTSVOICE environment variable
-# This file lives in /home/Your_User_Name/scripts
+# This file lives in /home/repeater/scripts
 #
-if [ ! -e /tmp/voice ]; then
-   echo "No voice definition found in /tmp"
-   echo "Please wait until after the hour"
-   exit
-fi
-
-source /home/Your_User_Name/scripts/ttsvoice-definition.sh
+source /home/repeater/scripts/ttsvoice-definition.sh
 CALLSIGN=W5HRC
-DSTNODE=519403
 DSTSOUNDS="/usr/local/share/asterisk/sounds"
 DSTRPTSOUNDS="/usr/local/share/asterisk/sounds/rpt"
 DSTLETTERS="/usr/local/share/asterisk/sounds/letters"
 DSTNUMBERS="/usr/local/share/asterisk/sounds/digits"
 DSTWX="/usr/local/share/asterisk/sounds/wx"
+DSTSILENCE="/usr/local/share/asterisk/sounds/silence"
+NODENUM="519405"
 
 function base() {
 for f in \
@@ -35,7 +30,7 @@ enter-num-blacklist entr-num-rmv-blklist extension feature-not-avail-line for fr
 hours im-sorry invalid is-in-use is-set-to is location lowercase minutes minute number-not-answering one-moment-please \
 please-try-again please-try-call-later pls-hold-while-try removed seconds second simul-call-limit-reached \
 something-terribly-wrong sorry ss-noservice telephone-number time to-extension \
-transfer uppercase with you-entered your
+transfer uppercase with you-entered your good-morning good-afternoon good-evening the-time-is degrees
   do
     fx=$f
     case $f in
@@ -56,8 +51,8 @@ transfer uppercase with you-entered your
       "to-extension")             fx="2-extension" ;;
       "transfer")                 fx="Please-hold-while-I-try-that-extension" ;;
     esac
-  asl-tts -n $DSTNODE -t $fx -v $TTSVOICE -f $DSTSOUNDS/$f
-#  asl-tts -n $DSTNODE -t $fx -v $TTSVOICE
+  asl-tts -n $NODENUM -t $fx -v $TTSVOICE -f $DSTSOUNDS/$f
+#  asl-tts -n $NODENUM -t $fx -v $TTSVOICE
   mv $DSTSOUNDS/$f.ul $DSTSOUNDS/$f.ulaw
   echo -n "$f "
 done
@@ -106,8 +101,8 @@ thetimeis thevoltageis thewindis timeout timeout-warning tranceive txpl unauthtx
       "unauthtx")   fx="un-authorized-transmit-frequency" ;;
       "unkeyedfor")   fx="un-keyed-for" ;;
     esac
-  asl-tts -n $DSTNODE -t $fx -v $TTSVOICE -f $DSTRPTSOUNDS/$f
-#  asl-tts -n $DSTNODE -t $fx -v $TTSVOICE
+  asl-tts -n $NODENUM -t $fx -v $TTSVOICE -f $DSTRPTSOUNDS/$f
+#  asl-tts -n $NODENUM -t $fx -v $TTSVOICE
   mv $DSTRPTSOUNDS/$f.ul $DSTRPTSOUNDS/$f.ulaw
   echo -n "$f "
 done
@@ -124,8 +119,8 @@ do
     case $f in
       "oclock")     fx="oh-clock" ;;
     esac
-  asl-tts -n $DSTNODE -t $fx -v $TTSVOICE -f $DSTNUMBERS/$f
-#  asl-tts -n $DSTNODE -t $fx -v $TTSVOICE
+  asl-tts -n $NODENUM -t $fx -v $TTSVOICE -f $DSTNUMBERS/$f
+#  asl-tts -n $NODENUM -t $fx -v $TTSVOICE
   mv $DSTNUMBERS/$f.ul $DSTNUMBERS/$f.ulaw
   echo -n "$f "
 done
@@ -141,8 +136,8 @@ do
     case $f in
       "dollar")       fx="dll-lur" ;;
     esac
-  asl-tts -n $DSTNODE -t $fx -v $TTSVOICE -f $DSTLETTERS/$f
-#  asl-tts -n $DSTNODE -t $fx -v $TTSVOICE
+  asl-tts -n $NODENUM -t $fx -v $TTSVOICE -f $DSTLETTERS/$f
+#  asl-tts -n $NODENUM -t $fx -v $TTSVOICE
   mv $DSTLETTERS/$f.ul $DSTLETTERS/$f.ulaw
   echo -n "$f "
 done
@@ -160,10 +155,21 @@ do
     case $f in
       "weather")       fx="wethur" ;;
     esac
-  asl-tts -n $DSTNODE -t $fx -v $TTSVOICE -f $DSTWX/$f
-#  asl-tts -n $DSTNODE -t $fx -v $TTSVOICE
+  asl-tts -n $NODENUM -t $fx -v $TTSVOICE -f $DSTWX/$f
+#  asl-tts -n $NODENUM -t $fx -v $TTSVOICE
   mv $DSTWX/$f.ul $DSTWX/$f.ulaw
   echo -n "$f "
+done
+echo ""
+return 0
+}
+
+function silence() {
+
+for i in {1..10}
+do
+   sudo sox -n -r 8000 -c $i -e u-law $DSTSILENCE/$i.raw trim 0.0 1.0
+   mv $i.raw $i.ulaw
 done
 echo ""
 return 0
@@ -186,10 +192,16 @@ if [ ! -e $DSTWX ]; then
   echo "Creating dir "$DSTWX
   mkdir $DSTWX
 fi
+if [ ! -e $DSTSILENCE ]; then
+  echo "Creating dir "$DSTSILENCE
+  mkdir $DSTSILENCE
+fi
 
 base
 rpt
 numbers
 letters
 weather
+silence
 echo "End"
+exit 0
